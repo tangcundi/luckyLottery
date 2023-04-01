@@ -9,12 +9,10 @@ export const lotteries: LotteryType[] = [
     type: "prizeA",
     // 奖品数量
     amount: 3,
-    // 每次抽奖数量（人数）
-    numberPerLottey: 3,
     // 奖品名称
     title: "特等奖",
     // 奖品描述
-    description: "神秘大礼",
+    description: "苹果电脑",
     // 奖品图片
     picture: "../img/secrit.jpg",
     // 指定中奖人员,指定人数不能超过奖品数量，否则按顺序截取, 如果不指定则全部随机抽取
@@ -23,6 +21,26 @@ export const lotteries: LotteryType[] = [
         id: '01',
         name: '张三',
         nickname: 'zhangsan',
+      }
+    ]
+  },
+  {
+    // 奖品类型
+    type: "prizeB",
+    // 奖品数量
+    amount: 5,
+    // 奖品名称
+    title: "一等奖",
+    // 奖品描述
+    description: "苹果手机",
+    // 奖品图片
+    picture: "../img/secrit.jpg",
+    // 指定中奖人员,指定人数不能超过奖品数量，否则按顺序截取, 如果不指定则全部随机抽取
+    specialUsers: [
+      {
+        id: '02',
+        name: '王五',
+        nickname: 'wangwu',
       }
     ]
   },

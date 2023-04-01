@@ -3,8 +3,6 @@ export interface LotteryType {
   type: string;
   // 奖品数量
   amount: number;
-  // 每次抽奖数量（人数）
-  numberPerLottey: number;
   // 奖品名称
   title: string;
   // 奖品描述

@@ -9,8 +9,9 @@ function App() {
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [luckyUsers, setLuckyUsers] = useState<UserType[]>([]);
   const [currentLottery, setCurrentLottery] = useState<LotteryType>(lotteries[lotteries.length - 1]);
-  const [isShowImport, setIsShowImport] = useState(true);
+  const [ShowImport, setShowImport] = useState(true);
   const [isLottering, setIsLottering] = useState(false);
+  const [showLuckUsers, setShowLuckUsers] = useState(false);
 
   // 读取excel文件
   const readExcel = (file: File) => {
@@ -42,8 +43,13 @@ function App() {
     const file = e.target.files?.[0];
     if (file) {
       readExcel(file);
-      setIsShowImport(false);
+      setShowImport(false);
     }
+  }
+
+  // 获取currentLottery在lotteries中的index
+  const getCurrentLotteryIndex = () => {
+    return lotteries.findIndex(lottery => lottery.type === currentLottery.type);
   }
 
   const lotteryAlgorithm = (allUsersArr: UserType[], num: number, specialUsers: UserType[]) => {
@@ -67,20 +73,20 @@ function App() {
   }
 
   const handleLottery = () => {
-    const result = lotteryAlgorithm(allUsers, lotteries[0].numberPerLottey, lotteries[0].specialUsers);
+    const result = lotteryAlgorithm(allUsers, currentLottery.amount, currentLottery.specialUsers);
     setLuckyUsers(result);
   }
 
   return (
     <div className="App">
-      {isShowImport && <div className='import-data'>
+      {ShowImport && <div className='import-data'>
         <input type="file" onChange={handleImport} />
       </div>}
-      {!isShowImport && <div className='content'>
+      {!ShowImport && <div className='content'>
         <h1>当前抽奖：{currentLottery.title}</h1>
         <h2>奖品：{currentLottery.description}</h2>
         {isLottering && <div>抽奖中。。</div>}
-        {!isLottering && <div className='lucky-users'>
+        {!isLottering && showLuckUsers && <div className='lucky-users'>
           <h3>恭喜以下顾客中奖：</h3>
           {luckyUsers.map((user, index) => {
             return <div key={index}>{user.nickname}</div>
@@ -92,6 +98,10 @@ function App() {
         }}>开始抽奖</Button>}
         {isLottering && <Button type="primary" onClick={() => {
           setIsLottering(false);
+          setShowLuckUsers(true);
+          if(getCurrentLotteryIndex() !== 0) {
+            setCurrentLottery(lotteries[getCurrentLotteryIndex() - 1]);
+          }
         }}>结束抽奖</Button>}
       </div>}
     </div>
