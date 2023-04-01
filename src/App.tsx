@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { lotteries } from './config/config';
 import './App.css';
-import { LotteryType, UserType } from './types';
+import { LotteryType, UserType, luckyUsersType } from './types';
 import * as XLSX from 'xlsx';
 
 function App() {
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
-  const [luckyUsers, setLuckyUsers] = useState<UserType[]>([]);
+  const [luckyUsers, setLuckyUsers] = useState<luckyUsersType[]>([]);
   const [currentLottery, setCurrentLottery] = useState<LotteryType>(lotteries[lotteries.length - 1]);
+  const [remainTimes, setRemainTimes] = useState(0);
+  const [currentTimeLuckyUsers, setCurrentTimeLuckyUsers] = useState<UserType[]>([]);
   const [ShowImport, setShowImport] = useState(true);
   const [isLottering, setIsLottering] = useState(false);
   const [showLuckUsers, setShowLuckUsers] = useState(false);
+
+  useEffect(() => {
+    setRemainTimes(getLotteryTimes());
+  }, [currentLottery]);
 
   // 读取excel文件
   const readExcel = (file: File) => {
@@ -52,17 +58,27 @@ function App() {
     return lotteries.findIndex(lottery => lottery.type === currentLottery.type);
   }
 
+  // 定义获取抽奖次数方法，通过currentLottery.amount和currentLottery.amountPerTime计算
+  const getLotteryTimes = () => {
+    const lotteryTimes = Math.floor(currentLottery.amount / currentLottery.amountPerTime);
+    const remainder = currentLottery.amount % currentLottery.amountPerTime;
+    return remainder === 0 ? lotteryTimes : lotteryTimes + 1;
+  }
+
   const lotteryAlgorithm = (allUsersArr: UserType[], num: number, specialUsers: UserType[]) => {
-    let result = [];
+    let result: UserType[] = [];
     let tempUsersArr = [...allUsersArr];
-    // 添加specialUsers到result
-    result = [...specialUsers];
+    let length = num;
+    if(remainTimes === getLotteryTimes()) {
+      result = [...specialUsers];
+      length = num - specialUsers.length;
+    }
     // 获取specialUsers的id
     const specialUsersIdArr = specialUsers.map(user => user.id);
     // 过滤掉arrUsers中的specialUsers
     tempUsersArr = tempUsersArr.filter(user => !specialUsersIdArr.includes(user.id));
 
-    for (let i = 0; i < num - specialUsers.length; i++) {
+    for (let i = 0; i < length; i++) {
       let random = Math.floor(Math.random() * allUsersArr.length);
       result.push(allUsersArr[random]);
       tempUsersArr.splice(random, 1);
@@ -73,8 +89,23 @@ function App() {
   }
 
   const handleLottery = () => {
-    const result = lotteryAlgorithm(allUsers, currentLottery.amount, currentLottery.specialUsers);
-    setLuckyUsers(result);
+    const result = lotteryAlgorithm(allUsers, currentLottery.amountPerTime, currentLottery.specialUsers);
+    let tempLuckyUsers = luckyUsers.slice();
+    let currentTypeIndex = tempLuckyUsers.findIndex(luckyUser => luckyUser.type === currentLottery.type);
+    if(currentTypeIndex === -1) {
+      tempLuckyUsers = [...tempLuckyUsers, {
+        type: currentLottery.type,
+        users: result
+      }];
+    } else {
+      tempLuckyUsers[currentTypeIndex].users = [...tempLuckyUsers[currentTypeIndex].users, ...result];
+    }
+
+    setLuckyUsers([
+      ...tempLuckyUsers
+    ]);
+
+    setCurrentTimeLuckyUsers(result);
   }
 
   return (
@@ -88,21 +119,32 @@ function App() {
         {isLottering && <div>抽奖中。。</div>}
         {!isLottering && showLuckUsers && <div className='lucky-users'>
           <h3>恭喜以下顾客中奖：</h3>
-          {luckyUsers.map((user, index) => {
-            return <div key={index}>{user.nickname}</div>
+          {currentTimeLuckyUsers.map((user, index) => {
+            return <div key={index}>{user.nickname}</div>;
+          })}
+          <h3>中奖名单：</h3>
+          {luckyUsers[luckyUsers.length-1].users.map((user, index) => {
+            return <div key={index}>{user.nickname}</div>;
           })}
         </div>}
         {!isLottering && <Button type="primary" onClick={() => {
           setIsLottering(true);
           handleLottery();
-        }}>开始抽奖</Button>}
+          setRemainTimes(remainTimes - 1);
+        }} disabled={remainTimes === 0}>开始抽奖</Button>}
         {isLottering && <Button type="primary" onClick={() => {
           setIsLottering(false);
           setShowLuckUsers(true);
-          if(getCurrentLotteryIndex() !== 0) {
-            setCurrentLottery(lotteries[getCurrentLotteryIndex() - 1]);
-          }
+          
         }}>结束抽奖</Button>}
+        <div>剩余抽奖次数：{remainTimes}</div>
+        <p>
+          <Button type="primary" onClick={() => {
+            if (getCurrentLotteryIndex() !== 0) {
+              setCurrentLottery(lotteries[getCurrentLotteryIndex() - 1]);
+            }
+          }} disabled={getCurrentLotteryIndex() === 0}>开始下一奖项抽奖</Button>
+        </p>
       </div>}
     </div>
   )

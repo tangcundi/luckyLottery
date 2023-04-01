@@ -3,6 +3,8 @@ export interface LotteryType {
   type: string;
   // 奖品数量
   amount: number;
+  // 每次抽奖人数
+  amountPerTime: number;
   // 奖品名称
   title: string;
   // 奖品描述
@@ -17,4 +19,9 @@ export interface UserType {
   id: string;
   name: string;
   nickname: string;
+}
+
+export interface luckyUsersType {
+  type: string;
+  users: UserType[];
 }
