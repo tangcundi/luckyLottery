@@ -131,6 +131,7 @@ function App() {
           setIsLottering(true);
           handleLottery();
           setRemainTimes(remainTimes - 1);
+          setShowLuckUsers(false);
         }} disabled={remainTimes === 0}>开始抽奖</Button>}
         {isLottering && <Button type="primary" onClick={() => {
           setIsLottering(false);
@@ -143,6 +144,7 @@ function App() {
             if (getCurrentLotteryIndex() !== 0) {
               setCurrentLottery(lotteries[getCurrentLotteryIndex() - 1]);
             }
+            setShowLuckUsers(false);
           }} disabled={getCurrentLotteryIndex() === 0}>开始下一奖项抽奖</Button>
         </p>
       </div>}
