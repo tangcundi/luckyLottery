@@ -1,3 +1,3 @@
-import readExcel from "./readExcel";
+import { prizePics } from "./prizePics";
 
-export { readExcel };
+export { prizePics };

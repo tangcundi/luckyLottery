@@ -10,7 +10,7 @@ export interface LotteryType {
   // 奖品描述
   description: string;
   // 奖品图片
-  picture: string;
+  picture?: string;
   // 指定中奖人员,指定人数不能超过奖品数量，否则按顺序截取, 如果不指定则全部随机抽取
   specialUsers: UserType[];
 }

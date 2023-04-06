@@ -40,3 +40,35 @@
 .read-the-docs {
   color: #888;
 }
+
+.prize-pic-container {
+  margin-bottom: 15px;
+}
+
+.prize-pic {
+  border-radius: 8px;
+}
+
+.lottery-animation-container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 200px;
+  height: 200px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.top-buttons {
+  position:fixed;
+  right: 30px;
+  top: 10px;
+}
+
+.rest-times {
+  margin-top: 15px;
+}
+
+.lucky-users {
+  padding-bottom: 15px;
+}
